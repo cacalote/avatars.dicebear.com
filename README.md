@@ -5,7 +5,7 @@
 ![](http://avatars.dicebear.com/jane-jr-doe/female/200)
 ![](http://avatars.dicebear.com/john-jr-doe/male/200)
 
-## Try your self!
+## Try it!
 
 https://avatars.dicebear.com/:seed/:(male|female)/:size/
 
