@@ -9,6 +9,6 @@
 
 https://avatars.dicebear.com/:seed/:(male|female)/:size/
 
-## Checkout the lib!
+## Check out the lib!
 
 https://github.com/DiceBear/avatars
