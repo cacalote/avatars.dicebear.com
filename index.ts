@@ -1,18 +1,18 @@
 import * as express from 'express';
 import * as Canvas from 'canvas';
-import toBuffer from 'blob-to-buffer';
+
 import Avatars from '@dicebear/avatars';
 import maleSpriteSet from '@dicebear/avatars/lib/spriteSets/male';
 import femaleSpriteSet from '@dicebear/avatars/lib/spriteSets/female';
 
 let app = express();
-let spriteSets = {
-    male: maleSpriteSet,
-    female: femaleSpriteSet
+let spriteSets: { [index: string]: Avatars } = {
+    male: new Avatars(maleSpriteSet),
+    female: new Avatars(femaleSpriteSet)
 }
 
 app.get('/:seed/:spriteSet/:size/', function (req, res, next) {
-    if (parseInt(req.param('size')) < 20) {
+    if (parseInt(req.params.size) < 20) {
         res.status(400).send('Minimum size of 20px.');
         next();
 
@@ -40,33 +40,25 @@ app.get('/:seed/:spriteSet/:size/', function (req, res, next) {
         return;
     }
 
-    var avatars = new Avatars(spriteSets[req.params.spriteSet], {
-        size: parseInt(req.params.size)
-    });
-
-    avatars.create(req.params.seed, (err, image) => {
+    spriteSets[req.params.spriteSet].create(req.params.seed, (err, canvas) => {
         if (err) {
             next(err);
 
             return;
         }
 
-        let canvasElement: HTMLCanvasElement = new Canvas();
-        canvasElement.width = image.width;
-        canvasElement.height = image.height;
-
-        canvasElement.getContext('2d').drawImage(image, 0, 0);
-
-        let buffer = canvasElement.toBuffer();
+        let buffer = canvas.toBuffer();
         res.writeHead(200, {
             'Content-Type': 'image/png',
             'Content-Length': buffer.length
         });
 
         res.end(buffer);
-    });
+    }, { size: parseInt(req.params.size) });
 });
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
+let port = process.env.PORT || 3000;
+
+app.listen(port, function () {
+  console.log('Example app listening on port '+port);
 });
