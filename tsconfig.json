@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "allowJs": true,
+        "module": "es6",
+        "moduleResolution": "node",
+        "typeRoots": [
+            "./typings/",
+            "./node_modules/@types/"
+        ]
+    }
+}
