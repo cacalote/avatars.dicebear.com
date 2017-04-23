@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
+let ms = require('ms');
 
 import Avatars from '@dicebear/avatars';
 import maleSpriteSet from '@dicebear/avatars/lib/spriteSets/male';
@@ -17,15 +18,15 @@ let spriteSets: { [index: string]: Avatars } = {
 let router = express.Router();
 
 router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
-    if (parseInt(req.params.size) < 20) {
-        res.status(400).send('Minimum size of 20px.');
+    if (parseInt(req.params.size) < config.minSize) {
+        res.status(400).send('Minimum size of '+config.minSize+'px.');
         next();
 
         return;
     }
 
-    if (parseInt(req.params.size) > 200) {
-        res.status(400).send('Maximum size of 200px.');
+    if (parseInt(req.params.size) > config.maxSize) {
+        res.status(400).send('Maximum size of '+config.maxSize+'px.');
         next();
 
         return;
@@ -56,10 +57,10 @@ router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
 
         res.status(200);
         res.setHeader('Content-Type', 'image/png');
-        res.setHeader('Cache-Control', config.cacheControl);
+        res.setHeader('Cache-Control', 'public, max-age=' + (ms(config.httpCaching) / 1000));
         res.end(buffer);
 
-        let filePath = path.resolve(config.public, './'+req.path);
+        let filePath = path.resolve(config.public, './'+decodeURIComponent(req.path));
 
         mkdirp(path.dirname(filePath), (err) => {
             if (err) {
@@ -67,7 +68,7 @@ router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
                 return;
             }
 
-            fs.writeFile(path.resolve(config.public, './'+req.path), buffer, function(err) {
+            fs.writeFile(filePath, buffer, function(err) {
                 if (err) {
                     console.error(err);
                 }

@@ -8,7 +8,9 @@ import v1 from './v1/';
 
 let app = express();
 
-app.use(express.static('./public/'));
+app.use(express.static('./public/', {
+  maxAge: config.httpCaching
+}));
 app.use(express.static('./node_modules/@dicebear/avatars/docs/'));
 app.use('/dist/', express.static('./node_modules/@dicebear/avatars/dist/'));
 
