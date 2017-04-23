@@ -2,7 +2,10 @@ import * as express from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
+import * as Chance from 'chance';
+
 let ms = require('ms');
+let fileExists = require('file-exists');
 
 import Avatars from '@dicebear/avatars';
 import maleSpriteSet from '@dicebear/avatars/lib/spriteSets/male';
@@ -46,34 +49,47 @@ router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
         return;
     }
 
-    spriteSets[req.params.spriteSet].create(req.params.seed, { size: parseInt(req.params.size) }, (err, canvas) => {
-        if (err) {
-            next(err);
+    let chance = new Chance(req.params.seed);
+    let filePath = path.resolve(config.public, 'v1', req.params.spriteSet, chance.seed.toString(), req.params.size+'.png');
 
-            return;
-        }
-
-        let buffer = canvas.toBuffer(undefined, 9);
-
-        res.status(200);
-        res.setHeader('Content-Type', 'image/png');
-        res.setHeader('Cache-Control', 'public, max-age=' + (ms(config.httpCaching) / 1000));
-        res.end(buffer);
-
-        let filePath = path.resolve(config.public, './'+decodeURIComponent(req.path));
-
-        mkdirp(path.dirname(filePath), (err) => {
+    fileExists(filePath, (err, exist) => {
+        if (exist) {
             if (err) {
                 console.log(err);
                 return;
             }
 
-            fs.writeFile(filePath, buffer, function(err) {
+            res.setHeader('Cache-Control', 'public, max-age=' + (ms(config.httpCaching) / 1000));
+            res.sendFile(filePath);
+        } else {
+            spriteSets[req.params.spriteSet].create(chance, { size: parseInt(req.params.size) }, (err, canvas) => {
                 if (err) {
-                    console.error(err);
+                    next(err);
+
+                    return;
                 }
+
+                let buffer = canvas.toBuffer(undefined, 9);
+
+                res.status(200);
+                res.setHeader('Content-Type', 'image/png');
+                res.setHeader('Cache-Control', 'public, max-age=' + (ms(config.httpCaching) / 1000));
+                res.end(buffer);
+
+                mkdirp(path.dirname(filePath), (err) => {
+                    if (err) {
+                        console.log(err);
+                        return;
+                    }
+
+                    fs.writeFile(filePath, buffer, function(err) {
+                        if (err) {
+                            console.error(err);
+                        }
+                    });
+                });
             });
-        });
+        }
     });
 });
 

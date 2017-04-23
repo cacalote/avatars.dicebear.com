@@ -4,7 +4,9 @@ var express = require("express");
 var fs = require("fs");
 var path = require("path");
 var mkdirp = require("mkdirp");
+var Chance = require("chance");
 var ms = require('ms');
+var fileExists = require('file-exists');
 var avatars_1 = require("@dicebear/avatars");
 var male_1 = require("@dicebear/avatars/lib/spriteSets/male");
 var female_1 = require("@dicebear/avatars/lib/spriteSets/female");
@@ -15,13 +17,13 @@ var spriteSets = {
 };
 var router = express.Router();
 router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
-    if (parseInt(req.params.size) < 20) {
-        res.status(400).send('Minimum size of 20px.');
+    if (parseInt(req.params.size) < config_1["default"].minSize) {
+        res.status(400).send('Minimum size of ' + config_1["default"].minSize + 'px.');
         next();
         return;
     }
-    if (parseInt(req.params.size) > 200) {
-        res.status(400).send('Maximum size of 200px.');
+    if (parseInt(req.params.size) > config_1["default"].maxSize) {
+        res.status(400).send('Maximum size of ' + config_1["default"].maxSize + 'px.');
         next();
         return;
     }
@@ -35,28 +37,41 @@ router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
         next();
         return;
     }
-    spriteSets[req.params.spriteSet].create(req.params.seed, { size: parseInt(req.params.size) }, function (err, canvas) {
-        if (err) {
-            next(err);
-            return;
-        }
-        var buffer = canvas.toBuffer(undefined, 9);
-        res.status(200);
-        res.setHeader('Content-Type', 'image/png');
-        res.setHeader('Cache-Control', 'public, max-age=' + (ms(config_1["default"].httpCaching) / 1000));
-        res.end(buffer);
-        var filePath = path.resolve(config_1["default"].public, './' + decodeURIComponent(req.path));
-        mkdirp(path.dirname(filePath), function (err) {
+    var chance = new Chance(req.params.seed);
+    var filePath = path.resolve(config_1["default"].public, 'v1', req.params.spriteSet, chance.seed.toString(), req.params.size + '.png');
+    fileExists(filePath, function (err, exist) {
+        if (exist) {
             if (err) {
                 console.log(err);
                 return;
             }
-            fs.writeFile(filePath, buffer, function (err) {
+            res.setHeader('Cache-Control', 'public, max-age=' + (ms(config_1["default"].httpCaching) / 1000));
+            res.sendFile(filePath);
+        }
+        else {
+            spriteSets[req.params.spriteSet].create(chance, { size: parseInt(req.params.size) }, function (err, canvas) {
                 if (err) {
-                    console.error(err);
+                    next(err);
+                    return;
                 }
+                var buffer = canvas.toBuffer(undefined, 9);
+                res.status(200);
+                res.setHeader('Content-Type', 'image/png');
+                res.setHeader('Cache-Control', 'public, max-age=' + (ms(config_1["default"].httpCaching) / 1000));
+                res.end(buffer);
+                mkdirp(path.dirname(filePath), function (err) {
+                    if (err) {
+                        console.log(err);
+                        return;
+                    }
+                    fs.writeFile(filePath, buffer, function (err) {
+                        if (err) {
+                            console.error(err);
+                        }
+                    });
+                });
             });
-        });
+        }
     });
 });
 exports["default"] = router;
