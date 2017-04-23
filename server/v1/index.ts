@@ -50,7 +50,7 @@ router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
     }
 
     let chance = new Chance(req.params.seed);
-    let filePath = path.resolve(config.public, 'v1', req.params.spriteSet, chance.seed.toString(), req.params.size+'.png');
+    let filePath = path.resolve(config.public, 'v1', req.params.spriteSet, chance.seed.toString(), parseInt(req.params.size)+'.png');
 
     fileExists(filePath, (err, exist) => {
         if (exist) {
