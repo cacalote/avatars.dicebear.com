@@ -16,29 +16,27 @@ var spriteSets = {
     female: new avatars_1["default"](female_1["default"])
 };
 var router = express.Router();
-router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
-    if (parseInt(req.params.size) < config_1["default"].minSize) {
+router.get(/\/v1\/([^/]+)\/([^/]*)\/(\d+)\.png/, function (req, res, next) {
+    var spriteSet = req.params[0];
+    var seed = req.params[1];
+    var size = req.params[2];
+    if (parseInt(size) < config_1["default"].minSize) {
         res.status(400).send('Minimum size of ' + config_1["default"].minSize + 'px.');
         next();
         return;
     }
-    if (parseInt(req.params.size) > config_1["default"].maxSize) {
+    if (parseInt(size) > config_1["default"].maxSize) {
         res.status(400).send('Maximum size of ' + config_1["default"].maxSize + 'px.');
         next();
         return;
     }
-    if (!spriteSets[req.params.spriteSet]) {
+    if (!spriteSets[spriteSet]) {
         res.status(400).send('Invalid sprite set. Available: ' + Object.keys(spriteSets).join(', '));
         next();
         return;
     }
-    if (!req.params.seed) {
-        res.status(400).send('Invalid seed');
-        next();
-        return;
-    }
-    var chance = new Chance(req.params.seed);
-    var filePath = path.resolve(config_1["default"].public, 'v1', req.params.spriteSet, chance.seed.toString(), parseInt(req.params.size) + '.png');
+    var chance = new Chance(seed);
+    var filePath = path.resolve(config_1["default"].public, 'v1', spriteSet, chance.seed.toString(), parseInt(size) + '.png');
     fileExists(filePath, function (err, exist) {
         if (exist) {
             if (err) {
@@ -49,7 +47,7 @@ router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
             res.sendFile(filePath);
         }
         else {
-            spriteSets[req.params.spriteSet].create(chance, { size: parseInt(req.params.size) }, function (err, canvas) {
+            spriteSets[spriteSet].create(chance, { size: parseInt(size) }, function (err, canvas) {
                 if (err) {
                     next(err);
                     return;

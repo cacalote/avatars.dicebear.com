@@ -20,37 +20,34 @@ let spriteSets: { [index: string]: Avatars } = {
 
 let router = express.Router();
 
-router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
-    if (parseInt(req.params.size) < config.minSize) {
+router.get(/\/v1\/([^/]+)\/([^/]*)\/(\d+)\.png/, function (req, res, next) {
+    let spriteSet = req.params[0];
+    let seed = req.params[1];
+    let size = req.params[2];
+
+    if (parseInt(size) < config.minSize) {
         res.status(400).send('Minimum size of '+config.minSize+'px.');
         next();
 
         return;
     }
 
-    if (parseInt(req.params.size) > config.maxSize) {
+    if (parseInt(size) > config.maxSize) {
         res.status(400).send('Maximum size of '+config.maxSize+'px.');
         next();
 
         return;
     }
 
-    if (!spriteSets[req.params.spriteSet]) {
+    if (!spriteSets[spriteSet]) {
         res.status(400).send('Invalid sprite set. Available: '+Object.keys(spriteSets).join(', '));
         next();
 
         return;
     }
 
-    if (!req.params.seed) {
-        res.status(400).send('Invalid seed');
-        next();
-
-        return;
-    }
-
-    let chance = new Chance(req.params.seed);
-    let filePath = path.resolve(config.public, 'v1', req.params.spriteSet, chance.seed.toString(), parseInt(req.params.size)+'.png');
+    let chance = new Chance(seed);
+    let filePath = path.resolve(config.public, 'v1', spriteSet, chance.seed.toString(), parseInt(size)+'.png');
 
     fileExists(filePath, (err, exist) => {
         if (exist) {
@@ -62,7 +59,7 @@ router.get('/v1/:spriteSet/:seed/:size.png', function (req, res, next) {
             res.setHeader('Cache-Control', 'public, max-age=' + (ms(config.httpCaching) / 1000));
             res.sendFile(filePath);
         } else {
-            spriteSets[req.params.spriteSet].create(chance, { size: parseInt(req.params.size) }, (err, canvas) => {
+            spriteSets[spriteSet].create(chance, { size: parseInt(size) }, (err, canvas) => {
                 if (err) {
                     next(err);
 
