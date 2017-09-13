@@ -22,7 +22,9 @@
     <script>
       var scriptElement = document.createElement('script');
 
-      scriptElement.setAttribute('src', document.location.href+'dist/avatars.pack.min.js');
+      API_ENDPOINT = document.location.origin;
+
+      scriptElement.setAttribute('src', API_ENDPOINT+'dist/avatars.pack.min.js');
       
       document.write(scriptElement.outerHTML);
     </script>
