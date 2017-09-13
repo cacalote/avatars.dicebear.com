@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Pixel-Art Avatar Placeholder with JS- and HTTP-API</title>
+    <meta name="description" content="Pixel-Art Avatar Placeholder by Identifier in JavaScript for Browsers and NodeJS">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel=“canonical“ href="https://avatars.dicebear.com/">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" type="text/css" href="./assets/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+
+    <script>
+      var scriptElement = document.createElement('script');
+
+      scriptElement.setAttribute('src', document.location.href+'dist/avatars.pack.min.js');
+      
+      document.write(scriptElement.outerHTML);
+    </script>
+
+    <script src="./assets/jquery.min.js"></script>
+    <script src="./assets/tether.min.js"></script>
+    <script src="./assets/bootstrap.min.js"></script>
+    <script src="./script.js"></script>
+  </head>
+  <body>
+    <a href="https://github.com/DiceBear/avatars">
+      <img class="fork-me" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png">
+    </a>
+
+    <a href="#" data-toggle="modal" data-target="#privacyModal" class="btn btn-link btn-sm">Privacy</a>
+
+    <div class="container">
+      <h1 class="text-center mt-5 mb-4">
+        <small class="text-muted">DiceBear</small><br />
+        <strong class="display-1">avatars</strong>
+      </h1>
+
+      <p class="text-center mb-5">
+        DiceBear Avatars is an free to use avatar placeholder service and library.<br>
+        The service renders a unique pixel-art avatar based on a seed.
+      </p>
+
+      <div class="mb-4">
+        <div class="row">
+          <div class="col-6 col-lg-3 offset-lg-3">
+            <div class="card text-center">
+              <div class="card-block text-center p-1">
+                <img id="avatar-male" class="img-fluid mb-2" src="https://dummyimage.com/200x200/bdbdbd/ffffff.png&text=please+wait..." alt="Male Avatar">
+                <p class="card-text"><strong>Male</strong></p>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="card text-center">
+              <div class="card-block text-center p-1">
+                <img id="avatar-female" class="img-fluid mb-2" src="https://dummyimage.com/200x200/bdbdbd/ffffff.png&text=please+wait..." alt="Female Avatar">
+                <p class="card-text"><strong>Female</strong></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-6">
+        <div class="col-12 col-lg-6 offset-lg-3">
+          <div class="form-group input-group-lg">
+            <input type="text" class="form-control text-center" id="seed" placeholder="Seed (e.g. name, e-mail-address,...)" autofocus />
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#installModal">Installation</button>
+            </div>
+            <div class="col-md-6">
+              <button type="button" class="btn btn-block btn-success" data-toggle="modal" data-target="#restModal">HTTP-API (recommended)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="text-center mt-4">
+        More Examples<br />
+        <span class="h5">
+          <small class="text-muted">
+            provided via HTTP-API
+          </small>
+        </span>
+      </h2>
+      <div id="infinite" class="row">
+          <div class="col-6 col-sm-4 col-lg-3 mt-3">
+            <div class="card text-center">
+              <div class="card-block text-center p-1">
+                <a href="#" target="_blank">
+                  <img class="img-fluid mb-2" src="https://dummyimage.com/200x200/bdbdbd/ffffff.png&text=please+wait..." alt="Avatar">
+                </a>
+                <p class="card-text"><strong class="name">Please wait...</strong></p>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="installModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Installation</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-1"><strong>Install via bower</strong></p>
+            <p>
+              <code>bower install dicebear-avatars</code>
+            </p>
+
+            <p class="mb-1"><strong>Install via npm</strong></p>
+            <p>
+              <code>npm install @dicebear/avatars</code>
+            </p>
+
+            <p class="small">
+              DiceBear Avatars requires <a href="https://github.com/caolan/async">async</a>,
+              <a href="https://github.com/chancejs/chancejs">chance</a> and
+              <a href="https://github.com/One-com/one-color">one-color</a>. Load this libraries
+              from a CDN, from bower or use the
+              <a href="https://github.com/DiceBear/avatars/blob/master/dist/avatars.pack.min.js">avatars.pack.min.js</a>
+              bundled within this Repository.
+            </p>
+
+            <hr />
+
+            <p class="mb-1"><strong>Create male avatar</strong></p>
+            <pre>
+              <code>
+  var avatars = var Avatars(Avatars.SPRITE_SETS.male);
+  var seed = '<span class="seed"></span>';
+
+  avatars.create(seed, { size: 200 }, function(err, canvas) {
+    // canvas.toDataURL()
+  });
+              </code>
+            </pre>
+
+            <p class="mb-1"><strong>Create female avatar</strong></p>
+            <pre>
+              <code>
+  var avatars = var Avatars(Avatars.SPRITE_SETS.female);
+  var seed = '<span class="seed"></span>';
+
+  avatars.create(seed, { size: 200 }, function(err, canvas) {
+    // canvas.toDataURL()
+  });
+              </code>
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="restModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">HTTP-API (recommended)</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-1"><strong>Male Avatar</strong></p>
+            <p>
+              <code>GET <span class="api-endpoint"></span>v1/male/<span class="seed"></span>/200.png</code>
+            </p>
+
+            <p class="mb-1"><strong>Female Avatar</strong></p>
+            <p>
+              <code>GET <span class="api-endpoint"></span>v1/female/<span class="seed"></span>/200.png</code>
+            </p>
+
+            <hr />
+
+            <p class="mb-1"><strong>URL Parameters</strong></p>
+            <p>
+              <code>GET <span class="api-endpoint"></span>v1/:spriteSet/:seed/:size.png</code>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="privacyModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Data Privacy Policy</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              The use of our site is possible without providing personal data. Please be aware that data transfer via the internet is subject to
+              security risks and, therefore, complete protection against third-party access to transferred data cannot be ensured.
+            </p>
+
+            <h5>Server Data</h5>
+            <p>
+              For technical reasons, data such as the following, which your internet browser transmits to us or to our web space provider (so called
+              server log files), is collected:
+            </p>
+            <ul>
+                <li>type and version of the browser you use</li>
+                <li>operating system</li>
+                <li>websites that linked you to our site (referrer URL)</li>
+                <li>websites that you visit</li>
+                <li>date and time of your visit</li>
+                <li>your Internet Protocol (IP) address.</li>
+            </ul>
+            <p>
+                This anonymous data thereby making it impossible to connect it to any particular person. The data is used for statistical purposes in
+                order to improve our website and services.
+            </p>
+
+            <p>
+              <a href="https://www.ratgeberrecht.eu/leistungen/muster-datenschutzerklaerung.html" target="_blank">Sample Data Privacy Policy Statement</a>
+              provided by the <a href="https://www.ratgeberrecht.eu/" target="_blank">Law Offices of Weiß &amp; Partner</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
