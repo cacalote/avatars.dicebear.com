@@ -8,7 +8,7 @@ import v1 from './v1/';
 
 let app = express();
 
-app.use(express.static('./node_modules/@dicebear/avatars/docs/'));
+app.use(express.static(config.public));
 app.use('/dist/', express.static('./node_modules/@dicebear/avatars/dist/'));
 
 app.use(v1);
