@@ -1,5 +1,7 @@
 # DiceBear Avatars API-Server
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/DiceBear/avatars-server.svg)](https://greenkeeper.io/)
+
 API-Server for [DiceBear Avatars](https://github.com/DiceBear/avatars).  
 Check out our API-Server: <https://avatars.dicebear.com>
 
