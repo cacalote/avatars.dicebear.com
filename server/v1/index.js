@@ -1,12 +1,8 @@
 "use strict";
 exports.__esModule = true;
 var express = require("express");
-var fs = require("fs");
-var path = require("path");
-var mkdirp = require("mkdirp");
 var Chance = require("chance");
 var ms = require('ms');
-var fileExists = require('file-exists');
 var avatars_1 = require("@dicebear/avatars");
 var male_1 = require("@dicebear/avatars/lib/spriteSets/male");
 var female_1 = require("@dicebear/avatars/lib/spriteSets/female");
@@ -36,40 +32,16 @@ router.get(/\/v1\/([^/]+)\/([^/]*)\/(\d+)\.png/, function (req, res, next) {
         return;
     }
     var chance = new Chance(seed);
-    var filePath = path.resolve(config_1["default"].public, 'v1', spriteSet, chance.seed.toString(), parseInt(size) + '.png');
-    fileExists(filePath, function (err, exist) {
-        if (exist) {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            res.setHeader('Cache-Control', 'public, max-age=' + (ms(config_1["default"].httpCaching) / 1000));
-            res.sendFile(filePath);
+    spriteSets[spriteSet].create(chance, { size: parseInt(size) }, function (err, canvas) {
+        if (err) {
+            next(err);
+            return;
         }
-        else {
-            spriteSets[spriteSet].create(chance, { size: parseInt(size) }, function (err, canvas) {
-                if (err) {
-                    next(err);
-                    return;
-                }
-                var buffer = canvas.toBuffer(undefined, 9);
-                res.status(200);
-                res.setHeader('Content-Type', 'image/png');
-                res.setHeader('Cache-Control', 'public, max-age=' + (ms(config_1["default"].httpCaching) / 1000));
-                res.end(buffer);
-                mkdirp(path.dirname(filePath), function (err) {
-                    if (err) {
-                        console.log(err);
-                        return;
-                    }
-                    fs.writeFile(filePath, buffer, function (err) {
-                        if (err) {
-                            console.error(err);
-                        }
-                    });
-                });
-            });
-        }
+        var buffer = canvas.toBuffer(undefined, 9);
+        res.status(200);
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Cache-Control', 'public, max-age=' + (ms(config_1["default"].httpCaching) / 1000));
+        res.end(buffer);
     });
 });
 exports["default"] = router;
